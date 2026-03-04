@@ -2,7 +2,7 @@ import test, { expect } from "@playwright/test";
 
 test("Login test", async ({ page }) => {
     // Navigate to SauceDemo
-    await page.goto("https://www.saucedemo.com/")
+    await page.goto("")
     await expect(page).toHaveTitle("Swag Labs")
 
     // Login
@@ -14,7 +14,7 @@ test("Login test", async ({ page }) => {
 
 test("Login with invalid credentials", async ({ page }) => {
     // Navigate to SauceDemo
-    await page.goto("https://www.saucedemo.com/")
+    await page.goto("")
     await expect(page).toHaveTitle("Swag Labs")
 
     // Fill in username
@@ -50,7 +50,7 @@ test("Login with invalid credentials", async ({ page }) => {
 
 test("Login in with locked_out_user", async ({ page }) => {
     // Navigate to SauceDemo
-    await page.goto("https://www.saucedemo.com/")
+    await page.goto("")
     await expect(page).toHaveTitle("Swag Labs")
 
     // Login
@@ -60,4 +60,25 @@ test("Login in with locked_out_user", async ({ page }) => {
 
     // Validate error message
     await expect(page.getByTestId('error')).toHaveText("Epic sadface: Sorry, this user has been locked out.")
+});
+
+test.only("Login in with locked_out_user on mobile", async ({ page, browser }) => {
+    const context = await browser.newContext({
+        viewport: { width: 375, height: 660 },
+        isMobile: true
+    });
+
+    const mobilePage = await context.newPage()
+
+    // Navigate to SauceDemo
+    await mobilePage.goto("")
+    await expect(mobilePage).toHaveTitle("Swag Labs")
+
+    // Login
+    await mobilePage.fill("#user-name", "locked_out_user")
+    await mobilePage.fill("#password", "secret_sauce")
+    await mobilePage.getByTestId('login-button').click()
+
+    // Validate error message
+    await expect(mobilePage.getByTestId('error')).toHaveText("Epic sadface: Sorry, this user has been locked out.")
 });
