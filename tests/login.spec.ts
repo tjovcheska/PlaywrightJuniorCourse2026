@@ -2,18 +2,21 @@ import test, { expect } from "@playwright/test";
 import users from "../fixtures/users.json"
 import { LoginPage } from "../pages/LoginPage";
 import { InventoryPage } from "../pages/InventoryPage";
+import { Navigation } from "../pages/Navigation";
 
 let loginPage: LoginPage;
 let inventoryPage: InventoryPage;
+let navigation: Navigation;
 
 test.describe("[WEB] Login functionallity", () => {
     test.beforeEach(async ({ page }) => {
-        // Navigate to SauceDemo
-        await page.goto("");
-        await expect(page).toHaveTitle("Swag Labs");
-
         loginPage = new LoginPage(page)
         inventoryPage = new InventoryPage(page)
+        navigation = new Navigation(page)
+
+        // Navigate to SauceDemo
+        await navigation.navigateToUrl("")
+        await loginPage.assertLoginPageTitle("Swag Labs")
     });
 
     Object.values(users).forEach(user => {

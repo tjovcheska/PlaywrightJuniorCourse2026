@@ -65,4 +65,8 @@ export class LoginPage {
             await expect(this.errorIcon).not.toBeVisible()
         }
     }
+
+    async assertLoginPageTitle(title: string) {
+        await expect(this.page).toHaveTitle(title);
+    }
 }

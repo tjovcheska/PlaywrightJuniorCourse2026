@@ -1,27 +1,31 @@
 import test, { expect } from "@playwright/test";
 import users from "../fixtures/users.json"
+import { LoginPage } from "../pages/LoginPage";
+import { InventoryPage } from "../pages/InventoryPage";
+import { Navigation } from "../pages/Navigation";
+
+let loginPage: LoginPage;
+let inventoryPage: InventoryPage;
+let navigation: Navigation;
 
 test.beforeEach(async ({ page }) => {
+    loginPage = new LoginPage(page)
+    inventoryPage = new InventoryPage(page)
+    navigation = new Navigation(page)
+
     // Navigate to SauceDemo
-    await page.goto("")
-    await expect(page).toHaveTitle("Swag Labs")
+    await navigation.navigateToUrl("")
+    await loginPage.assertLoginPageTitle("Swag Labs")
 
     // Login
-    await page.fill("#user-name", users.validUser.username)
-    await page.fill("#password", users.validUser.password)
-    await page.getByTestId('login-button').click() // await page.click("[data-test='login-button']")
-    await expect(page.getByTestId('title')).toHaveText('Products', { timeout: 10000 })
+    await loginPage.fillLoginForm(users.validUser.username, users.validUser.password)
+    await loginPage.clickLoginButton()
+    await inventoryPage.assertInventoryPageTitle('Products')
 });
 
 test.describe("Inventory page verification", async () => {
     test("Verify all products are visible", async ({ page }) => {
-        for (let i = 0; i < 6; i++) {
-            await expect(page.getByTestId('inventory-item').nth(i)).toBeVisible()
-            await expect(page.getByTestId('inventory-item-name').nth(i)).toBeVisible()
-            await expect(page.locator('.inventory_item_desc').nth(i)).toBeVisible()
-            await expect(page.locator('.btn_primary').nth(i)).toBeVisible()
-            await expect(page.getByTestId('inventory-item-price').nth(i)).toBeVisible()
-        }
+        await inventoryPage.verifyAllProductsVisible(6)
     });
 });
 
@@ -48,5 +52,15 @@ test.describe("Inventory page validation", () => {
         expect(cartSauceLabsBackpakName).toBe(sauceLabsBackpakName)
         expect(cartSauceLabsBackpakDesc).toBe(sauceLabsBackpakDesc)
     });
+});
+
+test.describe("Sorting tests", () => {
+    test("Sort inventory items - Low to High", async ({ page }) => {
+        await inventoryPage.verifyInventoryPageUrl('inventory.html')
+        await inventoryPage.selectOptionFromDropdown('lohi')
+        await inventoryPage.validateSorting()
+    });
+
+    // TODO: Implement other soring tests
 });
 
