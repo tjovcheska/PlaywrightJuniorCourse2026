@@ -1,66 +1,65 @@
 import test, { expect } from "@playwright/test";
 import users from "../fixtures/users.json"
 import { LoginPage } from "../pages/LoginPage";
+import { InventoryPage } from "../pages/InventoryPage";
+
+let loginPage: LoginPage;
+let inventoryPage: InventoryPage;
 
 test.describe("[WEB] Login functionallity", () => {
     test.beforeEach(async ({ page }) => {
         // Navigate to SauceDemo
         await page.goto("");
         await expect(page).toHaveTitle("Swag Labs");
+
+        loginPage = new LoginPage(page)
+        inventoryPage = new InventoryPage(page)
     });
 
     Object.values(users).forEach(user => {
-        test.only(`Login with ${user.username}`, async ({ page }) => {
-            const loginPage = new LoginPage(page)
+        test(`Login with ${user.username}`, async () => {
             // Login
             await loginPage.fillLoginForm(user.username, user.password)
             await loginPage.clickLoginButton();
             if (user.expectedResult === "success") {
-                await expect(page.getByTestId('title')).toHaveText('Products')
+                await inventoryPage.assertInventoryPageTitle('Products')
             }
         });
     });
 
-    test("Login with invalid credentials", async ({ page }) => {
-        // Fill in username
-        await page.getByTestId('username').fill(users.invalidUser.username)
-
-        // Fill in password
-        await page.getByTestId('password').fill(users.invalidUser.password)
+    test("Login with invalid credentials", async () => {
+        await loginPage.fillLoginForm(users.invalidUser.username, users.invalidUser.password)
 
         // Validate that error icons are not attached
-        // await expect(page.locator('.error-message-container')).not.toBeAttached()
-        await expect(page.locator('.error_icon')).not.toBeAttached()
+        await loginPage.validateErrorIconsAttached(false)
 
         // Click Login button
-        await page.locator('.submit-button').click()
+        await loginPage.clickLoginButton()
 
         // Validate error message
-        await expect(page.locator('.error-message-container')).toBeAttached()
-        await expect(page.getByTestId('error')).toHaveText("Epic sadface: Username and password do not match any user in this service")
+        await loginPage.validateErrorMessageAttached()
+        await loginPage.validateErrorMessageText("Epic sadface: Username and password do not match any user in this service")
 
         // Validate that error icons are attached
-        await expect(page.locator('.error_icon').first()).toBeAttached()
-        await expect(page.locator('.error_icon').last()).toBeAttached()
+        await loginPage.validateErrorIconsNthAttached(0)
+        await loginPage.validateErrorIconsNthAttached(1)
 
         // Click close error button
-        await page.getByTestId('error-button').click()
+        await loginPage.clickCloseErrorButton()
 
         // Validate that error icons are not attached
-        await expect(page.locator('.error_icon')).not.toBeVisible()
+        await loginPage.validateErrorIconsVisible(false)
 
         // Validate that error message card is not attached TODO: Uncomment when handled properly on th UI
         // await expect(page.locator('.error-message-container')).not.toBeVisible()
     });
 
-    test("Login in with locked_out_user", async ({ page }) => {
-        // Login
-        await page.fill("#user-name", users.lockedOutUser.username)
-        await page.fill("#password", users.lockedOutUser.password)
-        await page.getByTestId('login-button').click()
+    test("Login in with locked_out_user", async () => {
+        await loginPage.fillLoginForm(users.lockedOutUser.username, users.lockedOutUser.password)
+        await loginPage.clickLoginButton()
 
         // Validate error message
-        await expect(page.getByTestId('error')).toHaveText("Epic sadface: Sorry, this user has been locked out.")
+        await loginPage.validateErrorMessageText("Epic sadface: Sorry, this user has been locked out.")
     });
 });
 
