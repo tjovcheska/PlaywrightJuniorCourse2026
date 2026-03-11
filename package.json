@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "clean:reports": "rm -rf playwright-report && rm -rf test-results",
+    "test": "npm run clean:reports && npx playwright test",
+    "test:list": "clean:reports && npx playwright test --reporter=list"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

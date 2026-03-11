@@ -19,6 +19,16 @@
         "password": "secret_sauce",
         "expectedResult": "error"
     },  
+    "errorUser": {
+        "username": "error_user",
+        "password": "secret_sauce",
+        "expectedResult": "error"
+    },
+    "visualUser": {
+        "username": "visual_user",
+        "password": "secret_sauce",
+        "expectedResult": "success"
+    },
     "invalidUser": {
         "username": "invalid_user",
         "password": "secret_sauce",

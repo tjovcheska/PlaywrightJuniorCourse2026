@@ -1,12 +1,12 @@
-import test, { expect } from "@playwright/test";
+import test, { expect } from "@playwright/test"
 import users from "../fixtures/users.json"
-import { LoginPage } from "../pages/LoginPage";
-import { InventoryPage } from "../pages/InventoryPage";
-import { Navigation } from "../pages/Navigation";
+import { LoginPage } from "../pages/LoginPage"
+import { InventoryPage } from "../pages/InventoryPage"
+import { Navigation } from "../pages/Navigation"
 
-let loginPage: LoginPage;
-let inventoryPage: InventoryPage;
-let navigation: Navigation;
+let loginPage: LoginPage
+let inventoryPage: InventoryPage
+let navigation: Navigation
 
 test.describe("[WEB] Login functionallity", () => {
     test.beforeEach(async ({ page }) => {
@@ -17,18 +17,18 @@ test.describe("[WEB] Login functionallity", () => {
         // Navigate to SauceDemo
         await navigation.navigateToUrl("")
         await loginPage.assertLoginPageTitle("Swag Labs")
-    });
+    })
 
     Object.values(users).forEach(user => {
         test(`Login with ${user.username}`, async () => {
             // Login
             await loginPage.fillLoginForm(user.username, user.password)
-            await loginPage.clickLoginButton();
+            await loginPage.clickLoginButton()
             if (user.expectedResult === "success") {
                 await inventoryPage.assertInventoryPageTitle('Products')
             }
-        });
-    });
+        })
+    })
 
     test("Login with invalid credentials", async () => {
         await loginPage.fillLoginForm(users.invalidUser.username, users.invalidUser.password)
@@ -55,7 +55,7 @@ test.describe("[WEB] Login functionallity", () => {
 
         // Validate that error message card is not attached TODO: Uncomment when handled properly on th UI
         // await expect(page.locator('.error-message-container')).not.toBeVisible()
-    });
+    })
 
     test("Login in with locked_out_user", async () => {
         await loginPage.fillLoginForm(users.lockedOutUser.username, users.lockedOutUser.password)
@@ -63,24 +63,24 @@ test.describe("[WEB] Login functionallity", () => {
 
         // Validate error message
         await loginPage.validateErrorMessageText("Epic sadface: Sorry, this user has been locked out.")
-    });
-});
+    })
+})
 
 test.describe("[MOBILE] Login functionallty", () => {
 
-    let mobilePage;
+    let mobilePage
     test.beforeEach(async ({ browser }) => {
         const context = await browser.newContext({
             viewport: { width: 375, height: 660 },
             isMobile: true
-        });
+        })
 
         mobilePage = await context.newPage()
 
         // Navigate to SauceDemo
         await mobilePage.goto("")
         await expect(mobilePage).toHaveTitle("Swag Labs")
-    });
+    })
 
     test("Login in with locked_out_user on mobile", async ({ page, browser }) => {
         // Login
@@ -90,7 +90,7 @@ test.describe("[MOBILE] Login functionallty", () => {
 
         // Validate error message
         await expect(mobilePage.getByTestId('error')).toHaveText("Epic sadface: Sorry, this user has been locked out.")
-    });
+    })
 
     test("Login in with invalid credentials on mobile", async ({ page, browser }) => {
         // Login
@@ -100,5 +100,5 @@ test.describe("[MOBILE] Login functionallty", () => {
 
         // Validate error message
         await expect(mobilePage.getByTestId('error')).toHaveText("Epic sadface: Username and password do not match any user in this service")
-    });
-});
+    })
+})

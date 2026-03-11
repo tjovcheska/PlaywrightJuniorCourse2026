@@ -1,12 +1,12 @@
-import test, { expect } from "@playwright/test";
+import test, { expect } from "@playwright/test"
 import users from "../fixtures/users.json"
-import { LoginPage } from "../pages/LoginPage";
-import { InventoryPage } from "../pages/InventoryPage";
-import { Navigation } from "../pages/Navigation";
+import { LoginPage } from "../pages/LoginPage"
+import { InventoryPage } from "../pages/InventoryPage"
+import { Navigation } from "../pages/Navigation"
 
-let loginPage: LoginPage;
-let inventoryPage: InventoryPage;
-let navigation: Navigation;
+let loginPage: LoginPage
+let inventoryPage: InventoryPage
+let navigation: Navigation
 
 test.beforeEach(async ({ page }) => {
     loginPage = new LoginPage(page)
@@ -21,13 +21,13 @@ test.beforeEach(async ({ page }) => {
     await loginPage.fillLoginForm(users.validUser.username, users.validUser.password)
     await loginPage.clickLoginButton()
     await inventoryPage.assertInventoryPageTitle('Products')
-});
+})
 
 test.describe("Inventory page verification", async () => {
     test("Verify all products are visible", async ({ page }) => {
         await inventoryPage.verifyAllProductsVisible(6)
-    });
-});
+    })
+})
 
 test.describe("Inventory page validation", () => {
     test("Product name should match in inventory and cart page", async ({ page }) => {
@@ -51,16 +51,23 @@ test.describe("Inventory page validation", () => {
         // Validate names match
         expect(cartSauceLabsBackpakName).toBe(sauceLabsBackpakName)
         expect(cartSauceLabsBackpakDesc).toBe(sauceLabsBackpakDesc)
-    });
-});
+    })
+})
 
 test.describe("Sorting tests", () => {
     test("Sort inventory items - Low to High", async ({ page }) => {
         await inventoryPage.verifyInventoryPageUrl('inventory.html')
         await inventoryPage.selectOptionFromDropdown('lohi')
         await inventoryPage.validateSorting()
-    });
+    })
 
     // TODO: Implement other soring tests
-});
+})
+
+test.describe("Adding products to cart", () => {
+    test('Add all product to cart', async () => {
+        await inventoryPage.addAllProductsToCart()
+        await inventoryPage.goToCart()
+    })
+})
 

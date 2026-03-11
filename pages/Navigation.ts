@@ -1,13 +1,15 @@
-import { Page } from "@playwright/test";
+import test, { Page } from "@playwright/test"
 
 export class Navigation {
-    private page: Page;
+    private page: Page
 
     constructor(page: Page) {
-        this.page = page;
+        this.page = page
     }
 
     async navigateToUrl(url: string) {
-        await this.page.goto(url);
+        await test.step(`Navigate to URL: ${url}`, async () => {
+            await this.page.goto(url)
+        })
     }
 }
